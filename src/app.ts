@@ -36,7 +36,7 @@ app.post("/api/monitor/health", (req: Request, res: Response) => {
     targetServiceName,
     minRequestsPerSecond = 50,
     maxRequestsPerSecond = 100,
-    duration = 60, // in seconds
+    duration = 60,
   } = req.body;
 
   const baseURL = `http://${targetServiceName}:3000/api/health`
