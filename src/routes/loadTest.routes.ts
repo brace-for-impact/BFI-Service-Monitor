@@ -7,7 +7,7 @@ const router = Router();
 const loadTester = createLoadTester(config.axios);
 
 router.post(
-  "/monitor/health",
+  "/start",
   expressAsyncHandler((req: Request, res: Response) => {
     const success = loadTester.startLoadTest(req.body);
     if (!success) {

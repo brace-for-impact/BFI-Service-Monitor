@@ -1,16 +1,16 @@
-import { Server } from "socket.io";
+import { Server } from 'socket.io';
 
-let ioInstance: Server;
+let ioInstance: Server | null = null;
 
 export const setIO = (io: Server) => {
   ioInstance = io;
 };
 
-export const emitKafkaMessage = (msg: string) => {
+export const emitKafkaMessage = (message: string) => {
   if (!ioInstance) {
-    console.error("❌ Socket.IO not initialized");
+    console.warn("⚠️ Socket.IO instance not initialized");
     return;
   }
 
-  ioInstance.emit("kafka:message", { message: msg });
+  ioInstance.emit("kafka:message", { message });
 };

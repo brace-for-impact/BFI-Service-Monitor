@@ -1,13 +1,13 @@
-import { Server } from "socket.io";
-import { chatSocketHandler } from "./chat.socket";
+import { Server } from 'socket.io';
+import { chatSocketHandler } from './socketHandler';
 
 export const configureSockets = (io: Server) => {
-  io.on("connection", (socket) => {
+  io.on('connection', (socket) => {
     console.log(`🟢 Client connected: ${socket.id}`);
 
-    chatSocketHandler(socket);
+    chatSocketHandler(socket); // Handle chat-related events
 
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
       console.log(`🔴 Client disconnected: ${socket.id}`);
     });
   });
