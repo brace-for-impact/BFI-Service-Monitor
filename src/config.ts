@@ -13,10 +13,10 @@ interface AppConfig {
   clientId: string;
 }
 declare const __dirname: string;
-const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+const envFile = `.env.monitor.${process.env.NODE_ENV || "development"}`;
 
 dotenv.config({
-  path: path.resolve(__dirname, `../${envFile}`),
+  path: path.resolve(__dirname, `../../bfi-infrastructure/service-envs/${envFile}`),
 });
 
 export const config: AppConfig = {
