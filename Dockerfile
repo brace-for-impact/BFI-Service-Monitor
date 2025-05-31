@@ -14,6 +14,7 @@ CMD ["npm", "run", "dev"]
 # Builder (for both staging and prod)
 FROM base AS builder
 RUN npm install
+RUN npm run update:bfi
 COPY . .
 RUN npm run build
 
