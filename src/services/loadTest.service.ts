@@ -27,7 +27,7 @@ export const createLoadTester = (client: AxiosInstance): LoadTestController => {
   }: LoadTestOptions): boolean => {
     if (isLoadRunning) return false;
 
-    const baseURL = `http://${targetServiceName}:3000/api/health`;
+    const baseURL = `http://${targetServiceName}:3000/api/auth/health`;
     const startTime = Date.now();
 
     isLoadRunning = true;

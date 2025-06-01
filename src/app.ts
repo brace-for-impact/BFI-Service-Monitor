@@ -3,7 +3,6 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { configureSockets } from "./socket";
 import { setIO } from "./socket/socketService";
-import { startKafkaConsumer } from "./kafka";
 import { setupRoutes } from "./routes";
 import { setupMiddlewares } from "./middlewares";
 
@@ -18,6 +17,5 @@ setIO(io);
 setupMiddlewares(app);
 setupRoutes(app);
 configureSockets(io);
-startKafkaConsumer();
 
 export { server };
