@@ -18,7 +18,8 @@ const startServer = async () => {
       const key = message.key?.toString();
       const value = message.value?.toString();
       console.log(`[Kafka] ➡️ Received from ${topic}: ${key}`);
-      io.emit("kafka:message",  value);
+      io.emit("health-service-all",  value);
+      io.emit(`health-${JSON.parse(value ?? '{}').clientId}`,  value);
     },
   });
 };
