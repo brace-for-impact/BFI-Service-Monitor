@@ -1,5 +1,6 @@
-// loadTester.service.ts
-import { AxiosInstance } from 'axios';
+// src/services/loadTester.service.ts
+import { Worker } from "worker_threads";
+import path from "path";
 
 interface LoadTestOptions {
   targetServiceName: string;
@@ -14,64 +15,42 @@ interface LoadTestController {
   isRunning: () => boolean;
 }
 
-export const createLoadTester = (client: AxiosInstance): LoadTestController => {
-  let loadInterval: NodeJS.Timeout | null = null;
-  let loadTimeout: NodeJS.Timeout | null = null;
-  let isLoadRunning = false;
+export const createLoadTester = (): LoadTestController => {
+  let worker: Worker | null = null;
 
-  const startLoadTest = ({
-    targetServiceName,
-    minRequestsPerSecond = 50,
-    maxRequestsPerSecond = 100,
-    duration = 60,
-  }: LoadTestOptions): boolean => {
-    if (isLoadRunning) return false;
+  const startLoadTest = (options: LoadTestOptions): boolean => {
+    console.log('starting load test\n\n\n\n\n\n\n');
+    
+    if (worker) return false;
 
-    const baseURL = `http://${targetServiceName}:3000/api/auth/health`;
-    const startTime = Date.now();
+    const workerPath = path.resolve(__dirname,"../../dist/workers/loadTesterWorker.js");
 
-    isLoadRunning = true;
+    worker = new Worker(workerPath);
+    worker.postMessage(options);
 
-    loadInterval = setInterval(() => {
-      const elapsedSeconds = (Date.now() - startTime) / 1000;
-      if (elapsedSeconds >= duration) return;
-
-      const normalized = Math.sin((elapsedSeconds / duration) * Math.PI);
-      const currentRPS = Math.floor(
-        minRequestsPerSecond + normalized * (maxRequestsPerSecond - minRequestsPerSecond)
-      );
-
-      for (let i = 0; i < currentRPS; i++) {
-        client.get(baseURL).catch((err) => {
-          console.error(`[${targetServiceName}] Request failed:`, err.message);
-        });
+    worker.on("message", (msg) => {
+      if (msg.status === "done") {
+        console.log("✅ Load test completed.");
+        stopLoadTest();
       }
+    });
 
-      console.log(`⏱️ ${elapsedSeconds.toFixed(1)}s → ${currentRPS} requests/sec`);
-    }, 1000);
-
-    loadTimeout = setTimeout(() => {
+    worker.on("error", (err) => {
+      console.error("❌ Worker error:", err);
       stopLoadTest();
-      console.log("✅ Load test auto-stopped after duration.");
-    }, duration * 1000);
+    });
 
     return true;
   };
 
   const stopLoadTest = () => {
-    if (loadInterval) clearInterval(loadInterval);
-    if (loadTimeout) clearTimeout(loadTimeout);
-
-    loadInterval = null;
-    loadTimeout = null;
-    isLoadRunning = false;
+    if (worker) {
+      worker.terminate();
+      worker = null;
+    }
   };
 
-  const isRunning = () => isLoadRunning;
+  const isRunning = () => worker !== null;
 
-  return {
-    startLoadTest,
-    stopLoadTest,
-    isRunning,
-  };
+  return { startLoadTest, stopLoadTest, isRunning };
 };

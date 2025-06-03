@@ -1,18 +1,18 @@
+// src/routes/loadTest.route.ts
 import { Request, Response, Router } from "express";
 import expressAsyncHandler from "express-async-handler";
 import { createLoadTester } from "../services/loadTest.service";
-import { config } from "../config";
 
 const router = Router();
-const loadTester = createLoadTester(config.axios);
+const loadTester = createLoadTester();
 
 router.post(
   "/start",
-  expressAsyncHandler((req: Request, res: Response) => {
-    const success = loadTester.startLoadTest(req.body);
-    if (!success) {
+  expressAsyncHandler((req:Request, res:Response) => {
+    const started = loadTester.startLoadTest(req.body);
+    if (!started) {
       res.status(400).json({ message: "Already running" });
-      return;
+      return
     }
     res.json({ message: "Started" });
   })
@@ -20,12 +20,11 @@ router.post(
 
 router.get(
   "/stop",
-  expressAsyncHandler((req: Request, res: Response) => {
-    if (!loadTester.isRunning()) {
+  expressAsyncHandler((_:Request, res:Response) => {
+    if (!loadTester.isRunning()){
       res.status(400).json({ message: "Nothing to stop" });
-      return;
+      return 
     }
-
     loadTester.stopLoadTest();
     res.json({ message: "Stopped" });
   })
