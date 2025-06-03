@@ -15,15 +15,9 @@ export const socketExpressServerInit = async () => {
   return { app, server, io };
 }
 
-export const sendSocketMessage = (message: string) => {
-  if (!io) {
-    console.warn("⚠️ Socket.IO instance not initialized");
-    return;
-  }
-  console.log('sending message to socket\n\n\n\n\n\n');
-  
-
-  io.emit("kafka:message", { message });
+export const getSocketExpressServer = () => {
+    if (!app || !server || !io) {
+        throw new Error("Socket.IO server is not initialized. Please call socketExpressServerInit first.");
+    }
+    return { app, server, io };
 };
-
-export const getSocketExpressServer = () => ({app, server, io});

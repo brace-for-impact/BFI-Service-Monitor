@@ -1,21 +1,11 @@
-import express from "express";
-import http from "http";
-import { Server as SocketIOServer } from "socket.io";
-import { configureSockets } from "./socket";
-import { setIO } from "./socket/socketService";
 import { setupRoutes } from "./routes";
 import { setupMiddlewares } from "./middlewares";
+import shared from "@brace-for-impact/bfi-shared";
+import * as socketServices from "./services/socket.services";
 
-const app = express();
-const server = http.createServer(app);
-const io = new SocketIOServer(server, {
-  cors: { origin: "*" },
-});
-
-
-setIO(io);
+socketServices.socketExpressServerInit();
+const {app, io, server} = socketServices.getSocketExpressServer()
 setupMiddlewares(app);
 setupRoutes(app);
-configureSockets(io);
 
-export { server };
+export { server, io, app };
